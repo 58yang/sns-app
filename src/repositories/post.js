@@ -21,7 +21,7 @@ export const postRepository = {
     return data.map((post) => {
       return {
         ...post,
-        userId: post.userId,
+        userId: post.user_id,
         userName: post.user_metadata.name,
       };
     });
