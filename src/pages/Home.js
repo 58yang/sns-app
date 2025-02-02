@@ -7,6 +7,7 @@ import { SideMenu } from "../components/SideMenu";
 import { postRepository } from "../repositories/post";
 import { Post } from "../components/Post";
 import { Pagination } from "../components/Pagination";
+import { authRepository } from "../repositories/auth";
 
 const limit = 5;
 
@@ -14,7 +15,7 @@ function Home() {
   const [content, setContent] = useState("");
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
-  const { currentUser } = useContext(SessionContext);
+  const { currentUser, setCurrentUser } = useContext(SessionContext);
 
   useEffect(() => {
     fetchPosts();
@@ -51,6 +52,11 @@ function Home() {
     setPosts(posts.filter((post) => post.id !== postId));
   };
 
+  const signout = async () => {
+    await authRepository.singout();
+    setCurrentUser(null);
+  };
+
   if (currentUser == null) return <Navigate replace to="/signin" />;
 
   return (
@@ -58,7 +64,9 @@ function Home() {
       <header className="bg-[#34D399] p-4">
         <div className="container mx-auto flex items-center justify-between">
           <h1 className="text-3xl font-bold text-white">SNS APP</h1>
-          <button className="text-white hover:text-red-600">ログアウト</button>
+          <button className="text-white hover:text-red-600" onClick={signout}>
+            ログアウト
+          </button>
         </div>
       </header>
       <div className="container mx-auto mt-6 p-4">
