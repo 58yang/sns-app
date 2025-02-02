@@ -6,10 +6,14 @@ import { Navigate } from "react-router-dom";
 import { SideMenu } from "../components/SideMenu";
 import { postRepository } from "../repositories/post";
 import { Post } from "../components/Post";
+import { Pagination } from "../components/Pagination";
+
+const limit = 5;
 
 function Home() {
   const [content, setContent] = useState("");
   const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(1);
   const { currentUser } = useContext(SessionContext);
 
   useEffect(() => {
@@ -25,9 +29,21 @@ function Home() {
     setContent("");
   };
 
-  const fetchPosts = async () => {
-    const posts = await postRepository.find();
+  const fetchPosts = async (page) => {
+    const posts = await postRepository.find(page, limit);
     setPosts(posts);
+  };
+
+  const moveToNext = async () => {
+    const nextPage = page + 1;
+    await fetchPosts(nextPage);
+    setPage(nextPage);
+  };
+
+  const moveToPrev = async () => {
+    const prevPage = page - 1;
+    await fetchPosts(prevPage);
+    setPage(prevPage);
   };
 
   if (currentUser == null) return <Navigate replace to="/signin" />;
@@ -63,6 +79,10 @@ function Home() {
                 <Post key={post.id} post={post} />
               ))}
             </div>
+            <Pagination
+              onPrev={page > 1 ? moveToPrev : null}
+              onNext={posts.length >= limit ? moveToNext : null}
+            />
           </div>
           <SideMenu />
         </div>
